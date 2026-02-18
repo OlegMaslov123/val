@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Анимированное сердечко</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: Arial, sans-serif;
+            overflow-x: hidden;
+        }
+
+        /* Главный контейнер */
+        .main-container {
+            text-align: center;
+            padding: 20px;
+            width: 100%;
+            max-width: 1400px;
+            position: relative;
+            z-index: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        /* Контейнер для фото по бокам */
+        .photos-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            position: relative;
+            z-index: 15;
+        }
+
+        /* Левое фото */
+        .photo-left {
+            width: 200px;
+            height: 200px;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 20px 30px rgba(0,0,0,0.3);
+            border: 4px solid white;
+            transform: rotate(-5deg);
+            transition: transform 0.3s, box-shadow 0.3s;
+            z-index: 20;
+            margin-right: 20px;
+        }
+
+        /* Правое фото */
+        .photo-right {
+            width: 200px;
+            height: 200px;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 20px 30px rgba(0,0,0,0.3);
+            border: 4px solid white;
+            transform: rotate(5deg);
+            transition: transform 0.3s, box-shadow 0.3s;
+            z-index: 20;
+            margin-left: 20px;
+        }
+
+        /* Эффект при наведении на фото */
+        .photo-left:hover, .photo-right:hover {
+            transform: rotate(0deg) scale(1.1);
+            box-shadow: 0 30px 40px rgba(0,0,0,0.4);
+            border-color: #ffd700;
+        }
+
+        /* Стили для изображений */
+        .photo-left img, .photo-right img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+
+        /* Заглушки для фото (временные изображения) */
+        .photo-placeholder {
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, #ff6b6b, #ffd93d);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 2em;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        /* Центральный контент */
+        .center-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex: 1;
+            z-index: 10;
+        }
+
+        /* Контейнер только для сердца */
+        .heart-section {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 30px auto;
+            padding: 20px;
+            position: relative;
+            z-index: 5;
+        }
+
+        /* Контейнер только для текста */
+        .text-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            padding: 20px;
+            position: relative;
+            z-index: 10;
+        }
+
+        /* Базовый размер для мобильных телефонов */
+        .heart {
+            width: 80px;
+            height: 80px;
+            background: #ff4d4d;
+            position: relative;
+            transform: rotate(-45deg);
+            animation: heartbeat 1.4s infinite;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+            z-index: 2;
+        }
+
+        .heart::before,
+        .heart::after {
+            content: "";
+            width: 80px;
+            height: 80px;
+            background: #ff4d4d;
+            border-radius: 50%;
+            position: absolute;
+            z-index: 1;
+        }
+
+        .heart::before {
+            left: 40px;
+            top: 0;
+        }
+
+        .heart::after {
+            left: 0;
+            top: -40px;
+        }
+
+        /* Стили для текста */
+        .title {
+            color: white;
+            font-size: 2em;
+            margin: 0;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+            animation: fadeIn 2s;
+            position: relative;
+            z-index: 15;
+        }
+
+        .message {
+            color: white;
+            font-size: 1em;
+            margin: 0;
+            opacity: 0.9;
+            animation: fadeIn 2s 0.5s both;
+            position: relative;
+            z-index: 12;
+        }
+
+        /* Фоновый элемент */
+        .background-element {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 20% 50%, rgba(255,255,255,0.1) 0%, transparent 50%);
+            z-index: -1;
+            pointer-events: none;
+        }
+
+        /* Адаптация для планшетов */
+        @media (min-width: 600px) {
+            .heart {
+                width: 120px;
+                height: 120px;
+            }
+            
+            .heart::before,
+            .heart::after {
+                width: 120px;
+                height: 120px;
+            }
+            
+            .heart::before {
+                left: 60px;
+            }
+            
+            .heart::after {
+                top: -60px;
+            }
+            
+            .title {
+                font-size: 3em;
+            }
+            
+            .message {
+                font-size: 1.3em;
+            }
+            
+            .text-section {
+                gap: 20px;
+            }
+
+            .photo-left, .photo-right {
+                width: 150px;
+                height: 150px;
+            }
+        }
+
+        /* Адаптация для ноутбуков */
+        @media (min-width: 900px) {
+            .heart {
+                width: 150px;
+                height: 150px;
+            }
+            
+            .heart::before,
+            .heart::after {
+                width: 150px;
+                height: 150px;
+            }
+            
+            .heart::before {
+                left: 75px;
+            }
+            
+            .heart::after {
+                top: -75px;
+            }
+            
+            .title {
+                font-size: 3.8em;
+            }
+            
+            .message {
+                font-size: 1.6em;
+            }
+
+            .photo-left, .photo-right {
+                width: 180px;
+                height: 180px;
+            }
+        }
+
+        /* Адаптация для больших экранов */
+        @media (min-width: 1200px) {
+            .heart {
+                width: 200px;
+                height: 200px;
+            }
+            
+            .heart::before,
+            .heart::after {
+                width: 200px;
+                height: 200px;
+            }
+            
+            .heart::before {
+                left: 100px;
+            }
+            
+            .heart::after {
+                top: -100px;
+            }
+            
+            .title {
+                font-size: 4.5em;
+            }
+            
+            .message {
+                font-size: 2em;
+            }
+
+            .photo-left, .photo-right {
+                width: 220px;
+                height: 220px;
+            }
+        }
+
+        /* Адаптация для очень больших экранов */
+        @media (min-width: 1600px) {
+            .heart {
+                width: 250px;
+                height: 250px;
+            }
+            
+            .heart::before,
+            .heart::after {
+                width: 250px;
+                height: 250px;
+            }
+            
+            .heart::before {
+                left: 125px;
+            }
+            
+            .heart::after {
+                top: -125px;
+            }
+            
+            .title {
+                font-size: 5.5em;
+            }
+            
+            .message {
+                font-size: 2.5em;
+            }
+
+            .photo-left, .photo-right {
+                width: 280px;
+                height: 280px;
+            }
+        }
+
+        /* Мобильная версия - фото сверху и снизу */
+        @media (max-width: 768px) {
+            .photos-container {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .photo-left, .photo-right {
+                margin: 0;
+                width: 200px;
+                height: 200px;
+            }
+
+            .photo-left {
+                transform: rotate(0deg);
+                margin-bottom: 20px;
+            }
+
+            .photo-right {
+                transform: rotate(0deg);
+                margin-top: 20px;
+            }
+
+            .center-content {
+                order: 2;
+            }
+        }
+
+        @keyframes heartbeat {
+            0% {
+                transform: rotate(-45deg) scale(1);
+            }
+            20% {
+                transform: rotate(-45deg) scale(1.25);
+            }
+            40% {
+                transform: rotate(-45deg) scale(1.5);
+            }
+            60% {
+                transform: rotate(-45deg) scale(1.25);
+            }
+            80% {
+                transform: rotate(-45deg) scale(1);
+            }
+            100% {
+                transform: rotate(-45deg) scale(1);
+            }
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .heart-section {
+            animation: float 3s ease-in-out infinite;
+            position: relative;
+            z-index: 5;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0);
+            }
+            50% {
+                transform: translateY(-10px);
+            }
+        }
+
+        /* Стили для подписей под фото */
+        .photo-caption {
+            text-align: center;
+            color: white;
+            margin-top: 8px;
+            font-size: 0.9em;
+            opacity: 0.8;
+        }
+
+        .photo-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+    </style>
+</head>
+<body>
+    <!-- Фоновый элемент -->
+    <div class="background-element"></div>
+    
+    <!-- Главный контейнер -->
+    <div class="main-container">
+        
+        <!-- Контейнер с фото по бокам -->
+        <div class="photos-container">
+            
+            <!-- Левое фото с подписью -->
+            <div class="photo-wrapper">
+                <div class="photo-left">
+                    <!-- ЗАМЕНИТЕ ЭТОТ ТЕКСТ НА ССЫЛКИ ВАШИХ ФОТО -->
+                    <img src="photo_2026-02-14_15-37-49.jpg" alt="Фото 1">
+                    <!-- ИЛИ ИСПОЛЬЗУЙТЕ ЗАГЛУШКУ -->
+                    <!-- <div class="photo-placeholder">📸 1</div> -->
+                </div>
+                <div class="photo-caption"></div>
+            </div>
+            
+            <!-- Центральный контент -->
+            <div class="center-content">
+                <!-- Контейнер для сердца -->
+                <div class="heart-section">
+                    <div class="heart"></div>
+                </div>
+                
+                <!-- Контейнер для текста -->
+                <div class="text-section">
+                    <h1 class="title">Владуля</h1>
+                    <p class="message">Я тебя люблю ❤️</p>
+                </div>
+            </div>
+            
+        </div>
+        
+    </div>
+    
+</body>
+</html>
